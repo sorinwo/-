@@ -1,37 +1,34 @@
-
 import discord
 from discord.ext import commands
 from discord import app_commands
 
-# Set up bot
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='/', intents=intents)
 
-# Global variables
 current_robux = 0
 current_won = 0
-ADMIN_ID = ADMIN_ID  # Admin's Discord ID
-calculator_message = None  # Store the calculator message
+ADMIN_ID = ADMIN_ID  
+calculator_message = None  
 
 @bot.tree.command(name="버튼생성", description="계산기 버튼을 생성합니다")
 async def create_price_buttons(interaction: discord.Interaction):
-    # Check if the user is the admin
+    
     if interaction.user.id != ADMIN_ID:
         await interaction.response.send_message("이 명령어는 관리자만 사용할 수 있습니다.")
         return
         
-    # Create buttons
-    view = discord.ui.View()
+   
+    view = discord.ui.View(timeout=None) 
     
-    # Create buttons with conversion labels
+    
     won_to_robux = discord.ui.Button(label="원 → 로벅 계산", style=discord.ButtonStyle.gray)
     robux_to_won = discord.ui.Button(label="로벅 → 원 계산", style=discord.ButtonStyle.gray)
     
-    # Add button callbacks
+    
     async def won_to_robux_callback(button_interaction):
         try:
-            # Create modal for won input
+           
             modal = discord.ui.Modal(title="원 → 로벅 계산")
             won_input = discord.ui.TextInput(
                 label="계산할 원화 금액을 입력하세요",
@@ -57,7 +54,7 @@ async def create_price_buttons(interaction: discord.Interaction):
     
     async def robux_to_won_callback(button_interaction):
         try:
-            # Create modal for robux input
+            
             modal = discord.ui.Modal(title="로벅 → 원 계산")
             robux_input = discord.ui.TextInput(
                 label="계산할 로벅스 금액을 입력하세요",
@@ -87,7 +84,7 @@ async def create_price_buttons(interaction: discord.Interaction):
     view.add_item(won_to_robux)
     view.add_item(robux_to_won)
     
-    # Send message with current price and buttons
+
     try:
         global calculator_message
         embed = discord.Embed(title="🧮 계산기", color=0x808080)
@@ -107,7 +104,7 @@ async def set_price(interaction: discord.Interaction, robux: int, price: int):
         await interaction.response.send_message("이 명령어는 관리자만 사용할 수 있습니다.")
         return
         
-    # If user is admin, proceed with price setting logic
+
     try:
         global current_robux, current_won, calculator_message
         current_robux = robux
@@ -116,7 +113,6 @@ async def set_price(interaction: discord.Interaction, robux: int, price: int):
         embed.add_field(name="", value=f"```{robux:,}로벅 = {price:,}원```", inline=False)
         await interaction.response.send_message(embed=embed)
         
-        # Update calculator message if it exists
         if calculator_message:
             calculator_embed = discord.Embed(title="🧮 계산기", color=0x808080)
             calculator_embed.add_field(name="현재 비율", value=f"```{current_robux:,}로벅 = {current_won:,}원```", inline=False)
@@ -136,5 +132,4 @@ async def on_ready():
     except Exception as e:
         print(f"슬래시 명령어 동기화 중 오류 발생: {e}")
 
-# Run the bot
 bot.run('BOT.TOKEN')
